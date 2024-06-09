@@ -29,9 +29,10 @@ def get_ip_info(domain):
         # Retrieve MX records
         mx_records = []
         try:
-            mx_records = [str(record.exchange) for record in dns.resolver.resolve(domain, 'MX')]
-        except dns.resolver.NoAnswer:
-            pass  # Handle the case where the domain has no MX records
+            mx_answers = dns.resolver.resolve(domain, 'MX')
+            mx_records = [str(record.exchange) for record in mx_answers]
+        except (dns.resolver.NoAnswer, dns.resolver.NXDOMAIN, dns.resolver.Timeout, dns.exception.DNSException):
+            pass  # Handle the case where the domain has no MX records or DNS resolution fails
 
         return ip_address, asn, asn_name, mx_records
     except socket.error as e:
